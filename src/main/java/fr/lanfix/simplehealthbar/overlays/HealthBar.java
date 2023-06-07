@@ -67,7 +67,7 @@ public class HealthBar implements HudRenderCallback {
     }
 
     private void renderHealthBar(MatrixStack matrixStack, float tickDelta, float x, float y, PlayerEntity player) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         float health = player.getHealth();
         float maxHealth = player.getMaxHealth();
@@ -117,7 +117,7 @@ public class HealthBar implements HudRenderCallback {
         String text = String.valueOf(absorption / 2);
         text = text.replace(".0", "");
         textRenderer.draw(matrixStack, text, x - textRenderer.getWidth(text) - 16, y - 9, 0xFFFF00);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, guiIcons);
         // blit heart container
@@ -137,7 +137,7 @@ public class HealthBar implements HudRenderCallback {
     }
 
     private void renderAbsorptionBar(MatrixStack matrixStack, float x, float y, PlayerEntity player) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         float absorption = player.getAbsorptionAmount();
         float maxHealth = player.getMaxHealth();
