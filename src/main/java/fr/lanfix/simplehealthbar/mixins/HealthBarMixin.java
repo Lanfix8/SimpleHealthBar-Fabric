@@ -15,7 +15,7 @@ public class HealthBarMixin {
 
     private static final HealthBar healthBar = new HealthBar();
 
-    @Inject(method = "render", at = @At(value = "HEAD")) // ou au début de renderStatusBars
+    @Inject(method = "render", at = @At(value = "HEAD"))
     public void renderHealthBar(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
         healthBar.render(matrices, tickDelta);
     }
