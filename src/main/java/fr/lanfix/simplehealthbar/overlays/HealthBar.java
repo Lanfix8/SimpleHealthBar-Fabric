@@ -2,7 +2,6 @@ package fr.lanfix.simplehealthbar.overlays;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.lanfix.simplehealthbar.SimpleHealthBar;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
@@ -12,7 +11,9 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 
-public class HealthBar implements HudRenderCallback {
+public class HealthBar {
+
+    private static final MinecraftClient mc = MinecraftClient.getInstance();
 
     private static final Identifier fullHealthBar = new Identifier(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/full.png");
     private static final Identifier witherHealthBar = new Identifier(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/wither.png");
@@ -26,9 +27,7 @@ public class HealthBar implements HudRenderCallback {
 
     private float intermediateHealth = 0;
 
-    @Override
-    public void onHudRender(MatrixStack matrixStack, float tickDelta) {
-        MinecraftClient mc = MinecraftClient.getInstance();
+    public void render(MatrixStack matrixStack, float tickDelta) {
         if (mc.cameraEntity instanceof PlayerEntity player
                 && !mc.options.hudHidden
                 && mc.interactionManager != null && mc.interactionManager.hasStatusBars()) {
