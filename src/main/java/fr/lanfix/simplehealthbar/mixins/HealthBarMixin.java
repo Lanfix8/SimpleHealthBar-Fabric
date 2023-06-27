@@ -1,8 +1,8 @@
 package fr.lanfix.simplehealthbar.mixins;
 
 import fr.lanfix.simplehealthbar.overlays.HealthBar;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,12 +16,12 @@ public class HealthBarMixin {
     private static final HealthBar healthBar = new HealthBar();
 
     @Inject(method = "render", at = @At(value = "HEAD"))
-    public void renderHealthBar(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        healthBar.render(matrices, tickDelta);
+    public void renderHealthBar(DrawContext context, float tickDelta, CallbackInfo ci) {
+        healthBar.render(context, tickDelta);
     }
 
-    @Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHealthBar(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/entity/player/PlayerEntity;IIIIFIIIZ)V"), method = "renderStatusBars")
-    public void disableVanillaHealthBar(InGameHud instance, MatrixStack matrices, PlayerEntity player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking) {
+    @Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHealthBar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/player/PlayerEntity;IIIIFIIIZ)V"), method = "renderStatusBars")
+    public void disableVanillaHealthBar(InGameHud instance, DrawContext context, PlayerEntity player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking) {
         // do nothing, vanilla health bar is not rendered anymore
     }
 
