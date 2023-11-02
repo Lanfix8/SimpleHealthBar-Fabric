@@ -20,9 +20,10 @@ public class HealthBar {
     private static final Identifier intermediateHealthBar = new Identifier(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/intermediate.png");
     private static final Identifier emptyHealthBar = new Identifier(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/empty.png");
     private static final Identifier absorptionBar = new Identifier(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/absorption.png");
-    private static final Identifier guiIcons = new Identifier("minecraft", "textures/gui/icons.png");
+    private static final Identifier heartContainer = new Identifier("minecraft", "textures/gui/sprites/hud/heart/container.png");
+    private static final Identifier absorptionHeart = new Identifier("minecraft", "textures/gui/sprites/hud/heart/absorbing_full.png");
 
-    private float intermediateHealth = 0;
+    private double intermediateHealth = 0;
 
     public void render(DrawContext context, float tickDelta) {
         if (mc.cameraEntity instanceof PlayerEntity player
@@ -66,8 +67,8 @@ public class HealthBar {
         float health = player.getHealth();
         float maxHealth = player.getMaxHealth();
         // Calculate bar proportions
-        float healthProportion;
-        float intermediateProportion;
+        double healthProportion;
+        double intermediateProportion;
         if (health < intermediateHealth) {
             healthProportion = health / maxHealth;
             intermediateProportion = (intermediateHealth - health) / maxHealth;
@@ -110,18 +111,18 @@ public class HealthBar {
         text = text.replace(".0", "");
         context.drawText(textRenderer, text, x - textRenderer.getWidth(text) - 16, y - 9, 0xFFFF00, false);
         // blit heart container
-        context.drawTexture(guiIcons,
+        context.drawTexture(heartContainer,
                 x - 16, y - 10,
-                16, 0,
+                0, 0,
                 9, 9,
-                256, 256);
+                9, 9);
         // blit heart
         context.setShaderColor(127F, 127F, 0F, 0.5F);
-        context.drawTexture(guiIcons,
+        context.drawTexture(absorptionHeart,
                 x - 16, y - 10,
-                160, 0,
+                0, 0,
                 9, 9,
-                256, 256);
+                9, 9);
         context.setShaderColor(1F, 1F, 1F, 1F);
     }
 
