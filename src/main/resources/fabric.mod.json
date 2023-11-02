@@ -17,19 +17,14 @@
   "icon": "assets/simple-health-bar/icon.png",
 
   "environment": "*",
-  "entrypoints": {
-    "main": [
-      "fr.lanfix.simplehealthbar.SimpleHealthBar"
-    ]
-  },
   "mixins": [
     "simple-health-bar.mixins.json"
   ],
 
   "depends": {
-    "fabricloader": ">=0.14.19",
+    "fabricloader": ">=0.14.24",
     "fabric": "*",
-    "minecraft": "~1.19.4",
+    "minecraft": "~1.20.2",
     "java": ">=17"
   },
   "suggests": {
