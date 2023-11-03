@@ -11,6 +11,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.util.Random;
+
 public class HealthBar {
 
     private static final MinecraftClient mc = MinecraftClient.getInstance();
@@ -30,7 +32,14 @@ public class HealthBar {
     private Identifier currentBar = fullHealthBar;
     private float intermediateHealth = 0;
 
-    public void render(DrawContext context, float tickDelta) {
+    private Random rng = new Random();
+
+    public static void setTicks(int ticks) {
+        HealthBar.ticks = ticks;
+    }
+    private static int ticks;
+
+    public void render(DrawContext context) {
         // If the HUD is not hidden and has status bars (like health), render!
         if (mc.cameraEntity instanceof PlayerEntity player
                 && !mc.options.hudHidden
@@ -50,7 +59,7 @@ public class HealthBar {
                 renderAbsorptionValue(textRenderer, context, (int) x, (int) y, player);
             }
 
-            renderHealthBar(context, tickDelta, x, y, player);
+            renderHealthBar(context, x, y, player);
             renderHealthValue(textRenderer, context, (int) x, (int) y, player);
 
         }
@@ -78,17 +87,32 @@ public class HealthBar {
         String text = String.valueOf(health);
         text = text.replace(".0", "");
 
+        // Shake sprite and value and color value red when <=20% health
+        boolean isLowHealth = health / maxHealth <= 0.2;
+
+        // Show hardcore versions of hearts when in hardcore
+        boolean isHardcore = player.getWorld().getLevelProperties().isHardcore();
+
+        // Color value green when regen
+        boolean playerHasRegen = player.hasStatusEffect(StatusEffects.REGENERATION)
+                || player.hasStatusEffect(StatusEffects.INSTANT_HEALTH);
+
         // Offset for sprites
         int offX = 1;
         int offY = -5;
 
-        boolean isLowHealth = health / maxHealth <= 0.2;
-        boolean playerHasRegen = player.hasStatusEffect(StatusEffects.REGENERATION)
-                || player.hasStatusEffect(StatusEffects.INSTANT_HEALTH);
+        rng.setSeed(ticks);
+        rng.nextFloat();
 
         // Cause sprite shaking when low health
         if (isLowHealth)
-            offY += (Math.random() * 2) - 1;
+            offY += (rng.nextFloat(2)) - 1;
+
+        // Offset to allow heart icon to represent current player status
+        int iconOffset = 0;
+        if (currentBar.equals(poisonHealthBar)) iconOffset = 88 - 52;
+        else if (currentBar.equals(witherHealthBar)) iconOffset = 124 - 52;
+        else if (currentBar.equals(frozenHealthBar)) iconOffset = 178 - 52;
 
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -97,21 +121,21 @@ public class HealthBar {
         // Draw heart background
         context.drawTexture(guiIcons,
                 x + offX, y + offY,
-                16, 0,
+                16, (isHardcore ? 45 : 0),
                 9, 9,
                 256, 256);
 
-        // Full heart if in good health, half heart if low
-        if (isLowHealth)
+        // Full heart if in good health, half heart if low, none if zero
+        if (isLowHealth && health > 0)
             context.drawTexture(guiIcons,
                     x + offX, y + offY,
-                    61, 0,
+                    61 + iconOffset, (isHardcore ? 45 : 0),
                     9, 9,
                     256, 256);
         else if (health > 0)
             context.drawTexture(guiIcons,
                     x + offX, y + offY,
-                    52, 0,
+                    52 + iconOffset, (isHardcore ? 45 : 0),
                     9, 9,
                     256, 256);
 
@@ -120,13 +144,12 @@ public class HealthBar {
         offY = -4;
 
         // Cause the value to shake when low health
-        if (isLowHealth) {
-            offY += (Math.random() * 2) - 1;
-        }
+        if (isLowHealth)
+            offY += (rng.nextFloat(2)) - 1;
 
-        // Show a special string on the death screen
+        // Show a special string on the death screen (different if in hardcore)
         if (health <= 0) {
-            text = Text.translatable("gui.simplehealthbar.zero_health").getString();
+            text = Text.translatable("gui.simplehealthbar.zero_health" + (isHardcore ? ".hardcore" : "")).getString();
         }
 
         // The health color: White when normal, pink when low health, green when regen (even if low health)
@@ -149,7 +172,7 @@ public class HealthBar {
         }
     }
 
-    private void renderHealthBar(DrawContext context, float tickDelta, float x, float y, PlayerEntity player) {
+    private void renderHealthBar(DrawContext context, float x, float y, PlayerEntity player) {
         float health = player.getHealth();
         float maxHealth = player.getMaxHealth();
 
