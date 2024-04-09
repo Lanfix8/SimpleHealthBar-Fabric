@@ -25,20 +25,15 @@ public class HealthBar {
 
     private double intermediateHealth = 0;
 
-    public void render(DrawContext context, float tickDelta) {
-        if (mc.cameraEntity instanceof PlayerEntity player
-                && !mc.options.hudHidden
+    public void render(DrawContext context, PlayerEntity player, int x, int y, float tickDelta) {
+        if (mc.cameraEntity instanceof PlayerEntity && !mc.options.hudHidden
                 && mc.interactionManager != null && mc.interactionManager.hasStatusBars()) {
-            int width = mc.getWindow().getScaledWidth();
-            int height = mc.getWindow().getScaledHeight();
-            float x = (float) width / 2 - 91;
-            float y = height - 39;
             TextRenderer textRenderer = mc.textRenderer;
             updateBarTextures(player);
-            renderHealthValue(textRenderer, context, (int) x, (int) y, player);
+            renderHealthValue(textRenderer, context, x, y, player);
             renderHealthBar(context, tickDelta, x, y, player);
             if (player.getAbsorptionAmount() > 0) {
-                renderAbsorptionValue(textRenderer, context, (int) x, (int) y, player);
+                renderAbsorptionValue(textRenderer, context, x, y, player);
                 renderAbsorptionBar(context, x, y, player);
             }
         }

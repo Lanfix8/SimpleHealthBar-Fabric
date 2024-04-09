@@ -6,23 +6,19 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InGameHud.class)
 public class HealthBarMixin {
 
     private static final HealthBar healthBar = new HealthBar();
 
-    @Inject(method = "render", at = @At(value = "HEAD"))
-    public void renderHealthBar(DrawContext context, float tickDelta, CallbackInfo ci) {
-        healthBar.render(context, tickDelta);
-    }
+    private int lastTicks;
 
     @Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHealthBar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/player/PlayerEntity;IIIIFIIIZ)V"), method = "renderStatusBars")
-    public void disableVanillaHealthBar(InGameHud instance, DrawContext context, PlayerEntity player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking) {
-        // do nothing, vanilla health bar is not rendered anymore
+    public void replaceVanillaHealthBar(InGameHud instance, DrawContext context, PlayerEntity player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking) {
+        healthBar.render(context, player, x, y, instance.getTicks() - lastTicks);
+        lastTicks = instance.getTicks();
     }
 
     @Redirect(at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(II)I"), method = "renderStatusBars")
