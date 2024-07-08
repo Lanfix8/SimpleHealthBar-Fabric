@@ -12,16 +12,16 @@ public class HealthBar {
 
     private static final MinecraftClient mc = MinecraftClient.getInstance();
 
-    private static final Identifier fullHealthBar = new Identifier(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/full.png");
-    private static final Identifier witherHealthBar = new Identifier(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/wither.png");
-    private static final Identifier poisonHealthBar = new Identifier(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/poison.png");
-    private static final Identifier frozenHealthBar = new Identifier(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/frozen.png");
+    private static final Identifier fullHealthBar = Identifier.of(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/full.png");
+    private static final Identifier witherHealthBar = Identifier.of(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/wither.png");
+    private static final Identifier poisonHealthBar = Identifier.of(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/poison.png");
+    private static final Identifier frozenHealthBar = Identifier.of(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/frozen.png");
     private Identifier currentBar = fullHealthBar;
-    private static final Identifier intermediateHealthBar = new Identifier(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/intermediate.png");
-    private static final Identifier emptyHealthBar = new Identifier(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/empty.png");
-    private static final Identifier absorptionBar = new Identifier(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/absorption.png");
-    private static final Identifier heartContainer = new Identifier("minecraft", "textures/gui/sprites/hud/heart/container.png");
-    private static final Identifier absorptionHeart = new Identifier("minecraft", "textures/gui/sprites/hud/heart/absorbing_full.png");
+    private static final Identifier intermediateHealthBar = Identifier.of(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/intermediate.png");
+    private static final Identifier emptyHealthBar = Identifier.of(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/empty.png");
+    private static final Identifier absorptionBar = Identifier.of(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/absorption.png");
+    private static final Identifier heartContainer = Identifier.of("minecraft", "textures/gui/sprites/hud/heart/container.png");
+    private static final Identifier absorptionHeart = Identifier.of("minecraft", "textures/gui/sprites/hud/heart/absorbing_full.png");
 
     private double intermediateHealth = 0;
 
