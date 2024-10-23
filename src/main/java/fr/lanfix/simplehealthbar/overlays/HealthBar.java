@@ -1,15 +1,19 @@
 package fr.lanfix.simplehealthbar.overlays;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import fr.lanfix.simplehealthbar.SimpleHealthBar;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.Random;
+
+import static net.minecraft.client.gui.DrawableHelper.GUI_ICONS_TEXTURE;
 
 public class HealthBar {
 
@@ -24,25 +28,23 @@ public class HealthBar {
     private static final Identifier emptyHealthBar = Identifier.of(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/empty.png");
     private static final Identifier absorptionBar = Identifier.of(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/absorption.png");
 
-    private static final Identifier heartContainer = Identifier.of("minecraft", "textures/gui/sprites/hud/heart/container.png");
-    private static final Identifier absorptionHeart = Identifier.of("minecraft", "textures/gui/sprites/hud/heart/absorbing_full.png");
-
     private Identifier currentBar = fullHealthBar;
     private double intermediateHealth = 0;
 
-    public void render(DrawContext context, PlayerEntity player, int x, int y, float tickDelta) {
+    public void render(MatrixStack matrices, PlayerEntity player, int x, int y, float tickDelta) {
         if (mc.cameraEntity instanceof PlayerEntity && !mc.options.hudHidden
                 && mc.interactionManager != null && mc.interactionManager.hasStatusBars()) {
+
             TextRenderer textRenderer = mc.textRenderer;
             updateBarTextures(player);
             // Only render absorption when necessary
             if (player.getAbsorptionAmount() > 0) {
-                renderAbsorptionBar(context, x, y, player);
-                renderAbsorptionValue(textRenderer, context, x, y, player);
+                renderAbsorptionBar(matrices, x, y, player);
+                renderAbsorptionValue(textRenderer, matrices, x, y, player);
             }
             // We need to render the health bar after beacause they overlap a little
-            renderHealthBar(context, tickDelta, x, y, player);
-            renderHealthValue(textRenderer, context, x, y, player);
+            renderHealthBar(matrices, tickDelta, x, y, player);
+            renderHealthValue(textRenderer, matrices, x, y, player);
         }
     }
 
@@ -58,7 +60,7 @@ public class HealthBar {
         }
     }
 
-    private void renderHealthValue(TextRenderer textRenderer, DrawContext context, int x, int y, PlayerEntity player) {
+    private void renderHealthValue(TextRenderer textRenderer, MatrixStack matrices, int x, int y, PlayerEntity player) {
         double health = Math.ceil(player.getHealth() * 10) / 10;
         float maxHealth = player.getMaxHealth();
         String text = health + "/" + (int) player.getMaxHealth();
@@ -92,15 +94,15 @@ public class HealthBar {
             healthColor = 0x6fff9a;
 
         // Draw health value + 4px outline
-        context.drawText(textRenderer, text, x + offX + 1, y + offY, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX - 1, y + offY, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY + 1, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY - 1, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY, healthColor, false);
+        textRenderer.draw(matrices, text, x + offX + 1, y + offY, 0x000000);
+        textRenderer.draw(matrices, text, x + offX - 1, y + offY, 0x000000);
+        textRenderer.draw(matrices, text, x + offX, y + offY + 1, 0x000000);
+        textRenderer.draw(matrices, text, x + offX, y + offY - 1, 0x000000);
+        textRenderer.draw(matrices, text, x + offX, y + offY, healthColor);
 
     }
 
-    private void renderHealthBar(DrawContext context, float tickDelta, float x, float y, PlayerEntity player) {
+    private void renderHealthBar(MatrixStack matrices, float tickDelta, float x, float y, PlayerEntity player) {
         float health = player.getHealth();
         float maxHealth = player.getMaxHealth();
 
@@ -120,21 +122,24 @@ public class HealthBar {
         int intermediateWidth = (int) Math.ceil(80 * intermediateProportion);
 
         // Display full part
-        context.drawTexture(currentBar,
+        RenderSystem.setShaderTexture(0, currentBar);
+        DrawableHelper.drawTexture(matrices,
                 (int) x, (int) y,
                 0, 0,
                 healthWidth, 9,
                 80, 9);
 
         // Display intermediate part
-        context.drawTexture(intermediateHealthBar,
+        RenderSystem.setShaderTexture(0, intermediateHealthBar);
+        DrawableHelper.drawTexture(matrices,
                 (int) x + healthWidth, (int) y,
                 healthWidth, 0,
                 intermediateWidth, 9,
                 80, 9);
 
         // Display empty part
-        context.drawTexture(emptyHealthBar,
+        RenderSystem.setShaderTexture(0, emptyHealthBar);
+        DrawableHelper.drawTexture(matrices,
                 (int) x + healthWidth + intermediateWidth, (int) y,
                 healthWidth + intermediateWidth, 0,
                 80 - healthWidth - intermediateWidth, 9,
@@ -147,7 +152,7 @@ public class HealthBar {
         }
     }
 
-    private void renderAbsorptionValue(TextRenderer textRenderer, DrawContext context, int x, int y, PlayerEntity player) {
+    private void renderAbsorptionValue(TextRenderer textRenderer, MatrixStack matrices, int x, int y, PlayerEntity player) {
         double absorption = Math.ceil(player.getAbsorptionAmount() * 10) / 10;
         String text = String.valueOf(absorption);
         text = text.replace(".0", "");
@@ -157,31 +162,32 @@ public class HealthBar {
         int offY = -15;
 
         // blit heart container
-        context.drawTexture(heartContainer,
+        RenderSystem.setShaderTexture(0, GUI_ICONS_TEXTURE);
+        DrawableHelper.drawTexture(matrices,
                 x + offX, y + offY,
-                0, 0,
+                16, 0,
                 9, 9,
-                9, 9);
+                256, 256);
         // blit heart
-        context.drawTexture(absorptionHeart,
+        DrawableHelper.drawTexture(matrices,
                 x + offX, y + offY,
-                0, 0,
+                160, 0,
                 9, 9,
-                9, 9);
+                256, 256);
 
         // Text offset
         offX = 12;
         offY = -14;
 
         // Draw absorption value + 4px outline
-        context.drawText(textRenderer, text, x + offX + 1, y + offY, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX - 1, y + offY, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY + 1, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY - 1, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY, 0xffeba1, false);
+        textRenderer.draw(matrices, text, x + offX + 1, y + offY, 0x000000);
+        textRenderer.draw(matrices, text, x + offX - 1, y + offY, 0x000000);
+        textRenderer.draw(matrices, text, x + offX, y + offY + 1, 0x000000);
+        textRenderer.draw(matrices, text, x + offX, y + offY - 1, 0x000000);
+        textRenderer.draw(matrices, text, x + offX, y + offY, 0xffeba1);
     }
 
-    private void renderAbsorptionBar(DrawContext context, float x, float y, PlayerEntity player) {
+    private void renderAbsorptionBar(MatrixStack matrices, float x, float y, PlayerEntity player) {
         float absorption = player.getAbsorptionAmount();
         float maxHealth = player.getMaxHealth();
 
@@ -191,14 +197,16 @@ public class HealthBar {
         int absorptionWidth = (int) Math.ceil(80 * absorptionProportion);
 
         // Display full part
-        context.drawTexture(absorptionBar,
+        RenderSystem.setShaderTexture(0, absorptionBar);
+        DrawableHelper.drawTexture(matrices,
                 (int) x, (int) y - 10,
                 0, 0,
                 absorptionWidth, 9,
                 80, 9);
 
         // Display empty part
-        context.drawTexture(emptyHealthBar,
+        RenderSystem.setShaderTexture(0, emptyHealthBar);
+        DrawableHelper.drawTexture(matrices,
                 (int) x + absorptionWidth, (int) y - 10,
                 absorptionWidth, 0,
                 80 - absorptionWidth, 9,

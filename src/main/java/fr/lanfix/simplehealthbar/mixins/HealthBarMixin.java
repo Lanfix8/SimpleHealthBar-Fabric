@@ -1,13 +1,16 @@
 package fr.lanfix.simplehealthbar.mixins;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import fr.lanfix.simplehealthbar.overlays.HealthBar;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import static net.minecraft.client.gui.DrawableHelper.GUI_ICONS_TEXTURE;
 
 @Mixin(InGameHud.class)
 public class HealthBarMixin {
@@ -18,10 +21,11 @@ public class HealthBarMixin {
     @Unique
     private int lastTicks;
 
-    @Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHealthBar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/player/PlayerEntity;IIIIFIIIZ)V"), method = "renderStatusBars")
-    public void replaceVanillaHealthBar(InGameHud instance, DrawContext context, PlayerEntity player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking) {
-        healthBar.render(context, player, x, y, instance.getTicks() - lastTicks);
+    @Redirect(method = "renderStatusBars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHealthBar(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/entity/player/PlayerEntity;IIIIFIIIZ)V"))
+    public void replaceVanillaHealthBar(InGameHud instance, MatrixStack matrices, PlayerEntity player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking) {
+        healthBar.render(matrices, player, x, y, instance.getTicks() - lastTicks);
         lastTicks = instance.getTicks();
+        RenderSystem.setShaderTexture(0, GUI_ICONS_TEXTURE);
     }
 
     @Redirect(at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(II)I"), method = "renderStatusBars")
