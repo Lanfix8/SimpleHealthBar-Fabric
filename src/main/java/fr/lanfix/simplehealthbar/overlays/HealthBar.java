@@ -4,6 +4,7 @@ import fr.lanfix.simplehealthbar.SimpleHealthBar;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
@@ -120,21 +121,21 @@ public class HealthBar {
         int intermediateWidth = (int) Math.ceil(80 * intermediateProportion);
 
         // Display full part
-        context.drawTexture(currentBar,
+        context.drawTexture(RenderLayer::getGuiTextured, currentBar,
                 (int) x, (int) y,
                 0, 0,
                 healthWidth, 9,
                 80, 9);
 
         // Display intermediate part
-        context.drawTexture(intermediateHealthBar,
+        context.drawTexture(RenderLayer::getGuiTextured, intermediateHealthBar,
                 (int) x + healthWidth, (int) y,
                 healthWidth, 0,
                 intermediateWidth, 9,
                 80, 9);
 
         // Display empty part
-        context.drawTexture(emptyHealthBar,
+        context.drawTexture(RenderLayer::getGuiTextured, emptyHealthBar,
                 (int) x + healthWidth + intermediateWidth, (int) y,
                 healthWidth + intermediateWidth, 0,
                 80 - healthWidth - intermediateWidth, 9,
@@ -157,13 +158,13 @@ public class HealthBar {
         int offY = -15;
 
         // blit heart container
-        context.drawTexture(heartContainer,
+        context.drawTexture(RenderLayer::getGuiTextured, heartContainer,
                 x + offX, y + offY,
                 0, 0,
                 9, 9,
                 9, 9);
         // blit heart
-        context.drawTexture(absorptionHeart,
+        context.drawTexture(RenderLayer::getGuiTextured, absorptionHeart,
                 x + offX, y + offY,
                 0, 0,
                 9, 9,
@@ -191,14 +192,14 @@ public class HealthBar {
         int absorptionWidth = (int) Math.ceil(80 * absorptionProportion);
 
         // Display full part
-        context.drawTexture(absorptionBar,
+        context.drawTexture(RenderLayer::getGuiTextured, absorptionBar,
                 (int) x, (int) y - 10,
                 0, 0,
                 absorptionWidth, 9,
                 80, 9);
 
         // Display empty part
-        context.drawTexture(emptyHealthBar,
+        context.drawTexture(RenderLayer::getGuiTextured, emptyHealthBar,
                 (int) x + absorptionWidth, (int) y - 10,
                 absorptionWidth, 0,
                 80 - absorptionWidth, 9,
