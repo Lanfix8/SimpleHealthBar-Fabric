@@ -1,7 +1,6 @@
 package fr.lanfix.simplehealthbar.overlays;
 
 import fr.lanfix.simplehealthbar.SimpleHealthBar;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
@@ -14,7 +13,6 @@ import java.util.Random;
 
 public class HealthBar {
 
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
     Random rng = new Random();
 
     private static final Identifier fullHealthBar = Identifier.of(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/full.png");
@@ -32,19 +30,15 @@ public class HealthBar {
     private double intermediateHealth = 0;
 
     public void renderBars(DrawContext context, PlayerEntity player, int x, int y, float tickDelta) {
-        if (mc.cameraEntity instanceof PlayerEntity && !mc.options.hudHidden
-                && mc.interactionManager != null && mc.interactionManager.hasStatusBars()) {
-            updateBarTextures(player);
-            // Only render absorption when necessary
-            if (player.getAbsorptionAmount() > 0) {
-                renderAbsorptionBar(context, x, y, player);
-            }
-            renderHealthBar(context, tickDelta, x, y, player);
+        updateBarTextures(player);
+        // Only render absorption when necessary
+        if (player.getAbsorptionAmount() > 0) {
+            renderAbsorptionBar(context, x, y, player);
         }
+        renderHealthBar(context, tickDelta, x, y, player);
     }
 
-    public void renderTexts(DrawContext context, PlayerEntity player, int x, int y) {
-        TextRenderer textRenderer = mc.textRenderer;
+    public void renderTexts(TextRenderer textRenderer, DrawContext context, PlayerEntity player, int x, int y) {
         updateBarTextures(player);
         // Only render absorption when necessary
         if (player.getAbsorptionAmount() > 0) {

@@ -35,7 +35,7 @@ public class HealthBarMixin {
     public void renderTexts(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         int x = context.getScaledWindowWidth() / 2 - 91;
         int y = context.getScaledWindowHeight() - 39;
-        healthBar.renderTexts(context, client.player, x, y);
+        healthBar.renderTexts(client.textRenderer, context, client.player, x, y);
     }
 
     @Redirect(at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(II)I"), method = "renderStatusBars")
