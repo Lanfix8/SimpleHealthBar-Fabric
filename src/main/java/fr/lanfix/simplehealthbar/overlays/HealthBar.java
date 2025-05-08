@@ -1,7 +1,6 @@
 package fr.lanfix.simplehealthbar.overlays;
 
 import fr.lanfix.simplehealthbar.SimpleHealthBar;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
@@ -14,7 +13,6 @@ import java.util.Random;
 
 public class HealthBar {
 
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
     Random rng = new Random();
 
     private static final Identifier fullHealthBar = Identifier.of(SimpleHealthBar.MOD_ID, "textures/gui/healthbars/full.png");
@@ -31,20 +29,22 @@ public class HealthBar {
     private Identifier currentBar = fullHealthBar;
     private double intermediateHealth = 0;
 
-    public void render(DrawContext context, PlayerEntity player, int x, int y, float tickDelta) {
-        if (mc.cameraEntity instanceof PlayerEntity && !mc.options.hudHidden
-                && mc.interactionManager != null && mc.interactionManager.hasStatusBars()) {
-            TextRenderer textRenderer = mc.textRenderer;
-            updateBarTextures(player);
-            // Only render absorption when necessary
-            if (player.getAbsorptionAmount() > 0) {
-                renderAbsorptionBar(context, x, y, player);
-                renderAbsorptionValue(textRenderer, context, x, y, player);
-            }
-            // We need to render the health bar after beacause they overlap a little
-            renderHealthBar(context, tickDelta, x, y, player);
-            renderHealthValue(textRenderer, context, x, y, player);
+    public void renderBars(DrawContext context, PlayerEntity player, int x, int y, float tickDelta) {
+        updateBarTextures(player);
+        // Only render absorption when necessary
+        if (player.getAbsorptionAmount() > 0) {
+            renderAbsorptionBar(context, x, y, player);
         }
+        renderHealthBar(context, tickDelta, x, y, player);
+    }
+
+    public void renderTexts(TextRenderer textRenderer, DrawContext context, PlayerEntity player, int x, int y) {
+        updateBarTextures(player);
+        // Only render absorption when necessary
+        if (player.getAbsorptionAmount() > 0) {
+            renderAbsorptionValue(textRenderer, context, x, y, player);
+        }
+        renderHealthValue(textRenderer, context, x, y, player);
     }
 
     public void updateBarTextures(PlayerEntity player) {
@@ -153,6 +153,41 @@ public class HealthBar {
         String text = String.valueOf(absorption);
         text = text.replace(".0", "");
 
+        // Text offset
+        int offX = 12;
+        int offY = -14;
+
+        // Draw absorption value + 4px outline
+        context.drawText(textRenderer, text, x + offX + 1, y + offY, 0x000000, false);
+        context.drawText(textRenderer, text, x + offX - 1, y + offY, 0x000000, false);
+        context.drawText(textRenderer, text, x + offX, y + offY + 1, 0x000000, false);
+        context.drawText(textRenderer, text, x + offX, y + offY - 1, 0x000000, false);
+        context.drawText(textRenderer, text, x + offX, y + offY, 0xffeba1, false);
+    }
+
+    private void renderAbsorptionBar(DrawContext context, int x, int y, PlayerEntity player) {
+        float absorption = player.getAbsorptionAmount();
+        float maxHealth = player.getMaxHealth();
+
+        // Calculate bar proportions
+        float absorptionProportion = absorption / maxHealth;
+        if (absorptionProportion > 1) absorptionProportion = 1F;
+        int absorptionWidth = (int) Math.ceil(80 * absorptionProportion);
+
+        // Display full part
+        context.drawTexture(RenderLayer::getGuiTextured, absorptionBar,
+                x, y - 10,
+                0, 0,
+                absorptionWidth, 9,
+                80, 9);
+
+        // Display empty part
+        context.drawTexture(RenderLayer::getGuiTextured, emptyHealthBar,
+                x + absorptionWidth, y - 10,
+                absorptionWidth, 0,
+                80 - absorptionWidth, 9,
+                80, 9);
+
         // Offset of sprite
         int offX = 1;
         int offY = -15;
@@ -169,42 +204,6 @@ public class HealthBar {
                 0, 0,
                 9, 9,
                 9, 9);
-
-        // Text offset
-        offX = 12;
-        offY = -14;
-
-        // Draw absorption value + 4px outline
-        context.drawText(textRenderer, text, x + offX + 1, y + offY, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX - 1, y + offY, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY + 1, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY - 1, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY, 0xffeba1, false);
-    }
-
-    private void renderAbsorptionBar(DrawContext context, float x, float y, PlayerEntity player) {
-        float absorption = player.getAbsorptionAmount();
-        float maxHealth = player.getMaxHealth();
-
-        // Calculate bar proportions
-        float absorptionProportion = absorption / maxHealth;
-        if (absorptionProportion > 1) absorptionProportion = 1F;
-        int absorptionWidth = (int) Math.ceil(80 * absorptionProportion);
-
-        // Display full part
-        context.drawTexture(RenderLayer::getGuiTextured, absorptionBar,
-                (int) x, (int) y - 10,
-                0, 0,
-                absorptionWidth, 9,
-                80, 9);
-
-        // Display empty part
-        context.drawTexture(RenderLayer::getGuiTextured, emptyHealthBar,
-                (int) x + absorptionWidth, (int) y - 10,
-                absorptionWidth, 0,
-                80 - absorptionWidth, 9,
-                80, 9);
-
     }
 
 }

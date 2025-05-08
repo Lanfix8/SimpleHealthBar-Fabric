@@ -1,17 +1,24 @@
 package fr.lanfix.simplehealthbar.mixins;
 
 import fr.lanfix.simplehealthbar.overlays.HealthBar;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.player.PlayerEntity;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InGameHud.class)
 public class HealthBarMixin {
 
+    @Shadow @Final private MinecraftClient client;
     @Unique
     private static final HealthBar healthBar = new HealthBar();
 
@@ -20,8 +27,15 @@ public class HealthBarMixin {
 
     @Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHealthBar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/player/PlayerEntity;IIIIFIIIZ)V"), method = "renderStatusBars")
     public void replaceVanillaHealthBar(InGameHud instance, DrawContext context, PlayerEntity player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking) {
-        healthBar.render(context, player, x, y, instance.getTicks() - lastTicks);
+        healthBar.renderBars(context, player, x, y, instance.getTicks() - lastTicks);
         lastTicks = instance.getTicks();
+    }
+
+    @Inject(method = "renderExperienceLevel", at = @At(value = "HEAD"))
+    public void renderTexts(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+        int x = context.getScaledWindowWidth() / 2 - 91;
+        int y = context.getScaledWindowHeight() - 39;
+        healthBar.renderTexts(client.textRenderer, context, client.player, x, y);
     }
 
     @Redirect(at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(II)I"), method = "renderStatusBars")
