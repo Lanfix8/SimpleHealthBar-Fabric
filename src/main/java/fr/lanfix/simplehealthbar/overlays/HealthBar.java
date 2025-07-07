@@ -2,11 +2,12 @@ package fr.lanfix.simplehealthbar.overlays;
 
 import fr.lanfix.simplehealthbar.SimpleHealthBar;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 
 import java.util.Random;
@@ -86,17 +87,17 @@ public class HealthBar {
             offY += rng.nextInt(-1, 2);
 
         // The health color: White when normal, pink when low health, green when regen (even if low health)
-        int healthColor = 0xffffff;
+        int healthColor = Colors.WHITE;
         if (isLowHealth)
-            healthColor = 0xffa1b0;
+            healthColor = Colors.LIGHT_PINK;
         if (playerHasRegen)
-            healthColor = 0x6fff9a;
+            healthColor = Colors.GREEN;
 
         // Draw health value + 4px outline
-        context.drawText(textRenderer, text, x + offX + 1, y + offY, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX - 1, y + offY, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY + 1, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY - 1, 0x000000, false);
+        context.drawText(textRenderer, text, x + offX + 1, y + offY, Colors.BLACK, false);
+        context.drawText(textRenderer, text, x + offX - 1, y + offY, Colors.BLACK, false);
+        context.drawText(textRenderer, text, x + offX, y + offY + 1, Colors.BLACK, false);
+        context.drawText(textRenderer, text, x + offX, y + offY - 1, Colors.BLACK, false);
         context.drawText(textRenderer, text, x + offX, y + offY, healthColor, false);
 
     }
@@ -121,21 +122,21 @@ public class HealthBar {
         int intermediateWidth = (int) Math.ceil(80 * intermediateProportion);
 
         // Display full part
-        context.drawTexture(RenderLayer::getGuiTextured, currentBar,
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, currentBar,
                 (int) x, (int) y,
                 0, 0,
                 healthWidth, 9,
                 80, 9);
 
         // Display intermediate part
-        context.drawTexture(RenderLayer::getGuiTextured, intermediateHealthBar,
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, intermediateHealthBar,
                 (int) x + healthWidth, (int) y,
                 healthWidth, 0,
                 intermediateWidth, 9,
                 80, 9);
 
         // Display empty part
-        context.drawTexture(RenderLayer::getGuiTextured, emptyHealthBar,
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, emptyHealthBar,
                 (int) x + healthWidth + intermediateWidth, (int) y,
                 healthWidth + intermediateWidth, 0,
                 80 - healthWidth - intermediateWidth, 9,
@@ -158,11 +159,11 @@ public class HealthBar {
         int offY = -14;
 
         // Draw absorption value + 4px outline
-        context.drawText(textRenderer, text, x + offX + 1, y + offY, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX - 1, y + offY, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY + 1, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY - 1, 0x000000, false);
-        context.drawText(textRenderer, text, x + offX, y + offY, 0xffeba1, false);
+        context.drawText(textRenderer, text, x + offX + 1, y + offY, Colors.BLACK, false);
+        context.drawText(textRenderer, text, x + offX - 1, y + offY, Colors.BLACK, false);
+        context.drawText(textRenderer, text, x + offX, y + offY + 1, Colors.BLACK, false);
+        context.drawText(textRenderer, text, x + offX, y + offY - 1, Colors.BLACK, false);
+        context.drawText(textRenderer, text, x + offX, y + offY, Colors.LIGHT_YELLOW, false);
     }
 
     private void renderAbsorptionBar(DrawContext context, int x, int y, PlayerEntity player) {
@@ -175,14 +176,14 @@ public class HealthBar {
         int absorptionWidth = (int) Math.ceil(80 * absorptionProportion);
 
         // Display full part
-        context.drawTexture(RenderLayer::getGuiTextured, absorptionBar,
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, absorptionBar,
                 x, y - 10,
                 0, 0,
                 absorptionWidth, 9,
                 80, 9);
 
         // Display empty part
-        context.drawTexture(RenderLayer::getGuiTextured, emptyHealthBar,
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, emptyHealthBar,
                 x + absorptionWidth, y - 10,
                 absorptionWidth, 0,
                 80 - absorptionWidth, 9,
@@ -193,13 +194,13 @@ public class HealthBar {
         int offY = -15;
 
         // blit heart container
-        context.drawTexture(RenderLayer::getGuiTextured, heartContainer,
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, heartContainer,
                 x + offX, y + offY,
                 0, 0,
                 9, 9,
                 9, 9);
         // blit heart
-        context.drawTexture(RenderLayer::getGuiTextured, absorptionHeart,
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, absorptionHeart,
                 x + offX, y + offY,
                 0, 0,
                 9, 9,

@@ -31,7 +31,7 @@ public class HealthBarMixin {
         lastTicks = instance.getTicks();
     }
 
-    @Inject(method = "renderExperienceLevel", at = @At(value = "HEAD"))
+    @Inject(method = "renderMainHud", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/bar/Bar;renderAddons(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V"))
     public void renderTexts(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         int x = context.getScaledWindowWidth() / 2 - 91;
         int y = context.getScaledWindowHeight() - 39;
