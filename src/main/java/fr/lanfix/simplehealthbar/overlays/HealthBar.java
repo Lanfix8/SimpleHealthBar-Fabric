@@ -1,6 +1,7 @@
 package fr.lanfix.simplehealthbar.overlays;
 
 import fr.lanfix.simplehealthbar.SimpleHealthBar;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
@@ -75,7 +76,7 @@ public class HealthBar {
 
         // Show a special string on the death screen (different if in hardcore)
         if (health <= 0) {
-            boolean isHardcore = player.getWorld().getLevelProperties().isHardcore();
+            boolean isHardcore = MinecraftClient.getInstance().world.getLevelProperties().isHardcore();
             text = Text.translatable("gui.simplehealthbar.zero_health" + (isHardcore ? ".hardcore" : "")).getString();
         }
 
