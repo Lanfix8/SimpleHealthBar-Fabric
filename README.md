@@ -1,10 +1,20 @@
-# Simple Health Bar (Fabric version)
+# Simple Health Bar (NeoForge version)
 
+Simple Health Bar replaces Minecraft's default heart rendering with a compact health bar.
 
-Simple Health Bar replaces the default health rendering of minecraft with a cool health bar
+## Features
+- Wither, Poison and Freezing bar colors
+- Support for custom maximum health values
+- Absorption bar and value rendering
+- Smooth intermediate damage animation
 
- - Supports Wither, Poison, Freezing colors
- - Supports custom maximum health
- - Supports absorption
+## Development
+- Loader: NeoForge
+- Minecraft: 1.21.1
+- Java: 21
 
-Forge repository: https://github.com/Lanfix8/SimpleHealthBar-Forge
+Run the client in development with:
+
+```bash
+./gradlew runClient
+```
